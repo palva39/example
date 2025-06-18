@@ -122,9 +122,10 @@
 
         .plan-card.selected {
             border-color: #667eea;
-            background: linear-gradient(145deg, #ffffff, #ffffff);
-            color: white;
-            transform: scale(1.02);
+            background: linear-gradient(145deg, #e0eaff, #f0f4ff);
+            color: #222;
+            transform: scale(1.04);
+            box-shadow: 0 0 18px 4px #a3bffa, 0 2px 8px rgba(102,126,234,0.15);
         }
 
         .plan-title {
@@ -209,28 +210,85 @@
         }
 
         .cart-section {
-            background: #fff3cd;
-            border-radius: 15px;
-            padding: 25px;
-            border-left: 5px solid #ffc107;
+            background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+            border-radius: 18px;
+            box-shadow: 0 6px 24px rgba(102,126,234,0.10);
+            padding: 32px 28px 24px 28px;
+            margin-top: 18px;
+            margin-bottom: 18px;
+            min-height: 220px;
+            position: relative;
         }
 
-        .cart-item {
+        .cart-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 18px;
+            color: #4f46e5;
+            letter-spacing: 1px;
+        }
+
+        .cart-list {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .cart-item-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+            border: 2px solid #e0e7ff;
+            padding: 18px 22px;
+            min-width: 220px;
+            max-width: 320px;
+            flex: 1 1 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+
+        .cart-item-card .plan-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .cart-item-card .plan-price {
+            font-size: 1.1rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .cart-item-card .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f87171;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(248,113,113,0.12);
+            transition: background 0.2s;
+        }
+
+        .cart-item-card .remove-btn:hover {
+            background: #ef4444;
         }
 
         .cart-total {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745;
-            text-align: right;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #28a745;
+            font-size: 1.25rem;
+            color: #4f46e5;
+            font-weight: 700;
+            margin-top: 10px;
+            margin-bottom: 18px;
         }
 
         .btn {
@@ -633,6 +691,9 @@
             presupuesto: 0
         };
 
+        // --- Cart logic ---
+        let selectedPlans = [];
+
         function showTab(tabName) {
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => {
@@ -646,48 +707,80 @@
 
             document.getElementById(tabName).classList.add('active');
             document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
+
+            // Restore highlights for selected plans when returning to planes tab
+            if (tabName === 'planes') {
+                document.querySelectorAll('.plan-card').forEach(card => {
+                    const plan = card.getAttribute('data-plan');
+                    if (selectedPlans.find(p => p.name === plan)) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            }
+            // Update cart display when viewing cart
+            if (tabName === 'carrito') {
+                updateCartDisplay();
+            }
         }
 
         function selectPlan(planName, price) {
-            const planCards = document.querySelectorAll('.plan-card');
-            planCards.forEach(card => {
-                card.classList.remove('selected');
-            });
+            const planCard = document.querySelector(`.plan-card[data-plan="${planName}"]`);
+            if (!planCard) return;
 
-            const selectedCard = document.querySelector(`.plan-card[data-plan="${planName}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-                selectedPlan = { name: planName, price: price };
+            // Toggle selection
+            const alreadySelected = selectedPlans.find(p => p.name === planName);
+            if (alreadySelected) {
+                // Remove from cart
+                selectedPlans = selectedPlans.filter(p => p.name !== planName);
+                planCard.classList.remove('selected');
+            } else {
+                // Add to cart
+                selectedPlans.push({ name: planName, price: price });
+                planCard.classList.add('selected');
             }
+            updateCartDisplay();
         }
 
-        function updateRecommendations() {
-            const origen = document.getElementById('origen').value;
-            const recomendaciones = document.getElementById('recommendations-list');
-            recomendaciones.innerHTML = '';
-
-            if (origen === 'nativo') {
-                recomendaciones.innerHTML += `
-                    <div class="recommendation-item">
-                        <span>🌟 Explora nuevos lugares en tu ciudad</span>
-                        <strong>Recomendado para ti</strong>
-                    </div>
-                `;
-            } else if (origen === 'visitante') {
-                recomendaciones.innerHTML += `
-                    <div class="recommendation-item">
-                        <span>🗺️ Descubre los imperdibles de Medellín</span>
-                        <strong>Recomendado para ti</strong>
-                    </div>
-                `;
-            } else {
-                recomendaciones.innerHTML += `
-                    <div class="recommendation-item">
-                        <span>🌍 Conéctate con la cultura local</span>
-                        <strong>Recomendado para ti</strong>
-                    </div>
-                `;
+        function updateCartDisplay() {
+            const cartList = document.getElementById('selected-plans-list');
+            const cartTotal = document.getElementById('cart-total');
+            cartList.innerHTML = '';
+            let total = 0;
+            if (selectedPlans.length === 0) {
+                cartList.innerHTML = '<em>No has seleccionado ningún plan.</em>';
+                cartTotal.innerHTML = '';
+                return;
             }
+            cartList.className = 'cart-list';
+            selectedPlans.forEach(plan => {
+                // Find the original card for icon and description
+                const origCard = document.querySelector(`.plan-card[data-plan="${plan.name}"]`);
+                let icon = '', title = plan.name, desc = '', price = plan.price;
+                if (origCard) {
+                    title = origCard.querySelector('.plan-title')?.innerText || plan.name;
+                    desc = origCard.querySelector('p')?.innerText || '';
+                }
+                cartList.innerHTML += `
+                    <div class="cart-item-card">
+                        <button class='remove-btn' onclick="removeFromCart('${plan.name}')">&times;</button>
+                        <div class="plan-title">${icon} ${title}</div>
+                        <div class="plan-desc">${desc}</div>
+                        <div class="plan-price">$${price.toLocaleString()} COP</div>
+                    </div>
+                `;
+                total += price;
+            });
+            cartTotal.innerHTML = `<strong>Total: $${total.toLocaleString()} COP</strong>`;
+        }
+
+        function removeFromCart(planName) {
+            selectedPlans = selectedPlans.filter(p => p.name !== planName);
+            // Remove highlight from plan card if on planes tab
+            const card = document.querySelector(`.plan-card[data-plan="${planName}"]`);
+            if (card) card.classList.remove('selected');
+            updateCartDisplay();
         }
 
         function guardarPerfil() {
@@ -744,55 +837,6 @@
 
                 // Aquí se enviaría el mensaje al servidor o a la base de datos
             }
-        }
-
-        function selectPlan(planName, price) {
-            const planCards = document.querySelectorAll('.plan-card');
-            planCards.forEach(card => {
-                card.classList.remove('selected');
-            });
-
-            const selectedCard = document.querySelector(`.plan-card[data-plan="${planName}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-                selectedPlan = { name: planName, price: price };
-            }
-
-            updateCart();
-        }
-
-        function updateCart() {
-            const cartTotal = document.getElementById('cart-total');
-            const selectedPlansList = document.getElementById('selected-plans-list');
-            selectedPlansList.innerHTML = '';
-
-            let total = 0;
-            const selectedCards = document.querySelectorAll('.plan-card.selected');
-            selectedCards.forEach(card => {
-                const planName = card.getAttribute('data-plan');
-                const planPrice = parseInt(card.querySelector('.plan-price').innerText.replace(/\./g, '').replace('$', ''));
-                total += planPrice;
-
-                selectedPlansList.innerHTML += `
-                    <div class="cart-item">
-                        <span>${planName}</span>
-                        <strong class="plan-price">$${planPrice.toLocaleString()} COP</strong>
-                    </div>
-                `;
-            });
-
-            cartTotal.innerHTML = `Total: $${total.toLocaleString()} COP`;
-        }
-
-        function realizarPago() {
-            const cartItems = document.querySelectorAll('.cart-item');
-            if (cartItems.length === 0) {
-                alert('Tu carrito está vacío. Selecciona al menos un plan para continuar.');
-                return;
-            }
-
-            // Aquí se realizaría el proceso de pago
-            alert('Proceso de pago realizado con éxito!');
         }
 
         // Cargar clima al inicio
