@@ -153,42 +153,97 @@
         }
 
         .profile-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.92);
+            border-radius: 22px;
+            padding: 32px 28px 24px 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 6px 24px rgba(102,126,234,0.10);
             font-size: 1.13rem;
+        }
+
+        #perfil h2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #4f46e5;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        #perfil h3 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.3rem;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 18px;
         }
 
         .profile-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #ffffff;
+        .form-group label {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 7px;
+            letter-spacing: 0.2px;
         }
 
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+        .form-group input, .form-group select {
+            border-radius: 8px;
+            border: 1.5px solid #e0e7ff;
+            padding: 10px 14px;
+            font-size: 1.08rem;
+            font-family: inherit;
+            background: #f8fafc;
+            color: #222;
+            transition: border 0.2s;
         }
 
-        select:focus, input:focus {
+        .form-group input:focus, .form-group select:focus {
+            border-color: #6366f1;
             outline: none;
-            border-color: #667eea;
+        }
+
+        #perfil .btn {
+            background: #4f46e5;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            border-radius: 10px;
+            padding: 12px 36px;
+            margin-top: 18px;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.10);
+            transition: background 0.2s;
+        }
+
+        #perfil .btn:hover {
+            background: #3730a3;
+        }
+
+        /* Avatar circle for profile */
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a5b4fc 60%, #f0fdfa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.7rem;
+            color: #4f46e5;
+            font-weight: 800;
+            margin: 0 auto 18px auto;
+            box-shadow: 0 2px 12px rgba(79,70,229,0.10);
         }
 
         .recommendations {
@@ -418,6 +473,31 @@
             margin-top: 0 !important;
         }
 
+        /* Slideshow background styles */
+        .bg-slideshow-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .bg-slide {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
+        }
+        .bg-slide.active {
+            opacity: 1;
+        }
+        /* Make sure main content is above the slideshow */
+        body > .container, body > nav, body > header, body > main, body > .main-app-container {
+            position: relative;
+            z-index: 1;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -431,9 +511,73 @@
                 margin-bottom: 5px;
             }
         }
+
+        /* Custom modal for thank you message */
+        .thankyou-modal-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.35);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .thankyou-modal-bg.active {
+            display: flex;
+        }
+        .thankyou-modal {
+            background: #fff;
+            border-radius: 18px;
+            padding: 38px 32px 28px 32px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            text-align: center;
+            max-width: 90vw;
+            min-width: 260px;
+            animation: modalPop 0.4s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .thankyou-modal h2 {
+            color: #10b981;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .thankyou-modal button {
+            margin-top: 18px;
+            padding: 8px 28px;
+            border: none;
+            border-radius: 8px;
+            background: #10b981;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .thankyou-modal button:hover {
+            background: #059669;
+        }
     </style>
 </head>
 <body>
+    <!-- Background Slideshow -->
+    <div class="bg-slideshow-container">
+      <img src="photos/colombia1.jpg" class="bg-slide active" alt="Colombia 1" />
+      <img src="photos/colombia2.jpg" class="bg-slide" alt="Colombia 2" />
+      <img src="photos/colombia3.jpg" class="bg-slide" alt="Colombia 3" />
+    </div>
+    <!-- Thank You Modal -->
+    <div id="thankyouModalBg" class="thankyou-modal-bg">
+      <div class="thankyou-modal">
+        <h2>¡Gracias por tu compra!</h2>
+        <p>Tu pedido ha sido recibido con éxito.</p>
+        <button onclick="closeThankYouModal()">Cerrar</button>
+      </div>
+    </div>
+
         <!-- Hero Section -->
         <section class="hero-section">
             <!-- Animated Background -->
@@ -459,7 +603,7 @@
         </section>
 
         <!-- Navbar Section -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded-bottom mb-2" style="z-index:10;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-white shadow-sm rounded-bottom mb-2" style="z-index:10;">
             <div class="container justify-content-center">
                 <div class="tabs navbar-nav flex-row">
                     <button class="tab-btn nav-link active" onclick="showTab('planes')">📋 Planes</button>
@@ -572,13 +716,13 @@
 
         <!-- Tab: Mi Perfil -->
         <div id="perfil" class="tab-content">
-            <h2>👤 Configura tu Perfil</h2>
-            
+            <h2>👤 Mi Perfil</h2>
+            <div class="profile-avatar" id="profileAvatar">👤</div>
             <div class="profile-section">
                 <h3>Información Personal</h3>
                 <div class="profile-grid">
                     <div class="form-group">
-                        <label for="origen">Origen:</label>
+                        <label for="origen">Origen</label>
                         <select id="origen" onchange="updateRecommendations()">
                             <option value="extranjero">Extranjero</option>
                             <option value="nativo">Nativo de Medellín</option>
@@ -586,29 +730,28 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" placeholder="Tu nombre" />
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" placeholder="Tu nombre" oninput="updateAvatar()" />
                     </div>
                     <div class="form-group">
-                        <label for="apellido">Apellido:</label>
+                        <label for="apellido">Apellido</label>
                         <input type="text" id="apellido" placeholder="Tu apellido" />
                     </div>
                     <div class="form-group">
-                        <label for="email">Email:</label>
+                        <label for="email">Email</label>
                         <input type="email" id="email" placeholder="Tu email" />
                     </div>
                     <div class="form-group">
-                        <label for="telefono">Teléfono:</label>
+                        <label for="telefono">Teléfono</label>
                         <input type="tel" id="telefono" placeholder="Tu teléfono" />
                     </div>
                 </div>
             </div>
-
             <div class="profile-section">
                 <h3>Preferencias</h3>
                 <div class="profile-grid">
                     <div class="form-group">
-                        <label for="intereses">Intereses:</label>
+                        <label for="intereses">Intereses</label>
                         <select id="intereses" multiple>
                             <option value="gastronomia">Gastronomía</option>
                             <option value="aventura">Aventura</option>
@@ -617,12 +760,11 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="presupuesto">Presupuesto Aproximado:</label>
+                        <label for="presupuesto">Presupuesto Aproximado</label>
                         <input type="number" id="presupuesto" placeholder="Tu presupuesto en COP" />
                     </div>
                 </div>
             </div>
-
             <button class="btn" onclick="guardarPerfil()">Guardar Cambios</button>
         </div>
 
@@ -853,6 +995,32 @@
                     console.error('Error fetching weather data:', error);
                 });
         };
+
+        function realizarPago() {
+            document.getElementById('thankyouModalBg').classList.add('active');
+        }
+        function closeThankYouModal() {
+            document.getElementById('thankyouModalBg').classList.remove('active');
+        }
+
+        function updateAvatar() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const avatar = document.getElementById('profileAvatar');
+            if (nombre.length > 0) {
+                avatar.textContent = nombre[0].toUpperCase();
+            } else {
+                avatar.textContent = '👤';
+            }
+        }
+
+        // Simple JS slideshow for background
+        const slides = document.querySelectorAll('.bg-slide');
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 6000); // 6 seconds per slide
     </script>
 </body>
 </html>
