@@ -55,7 +55,7 @@
             background: rgba(202, 53, 53, 0.1);
             border-radius: 15px;
             padding: 5px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(100px);
         }
 
         .tab-btn {
@@ -603,7 +603,7 @@
         </section>
 
         <!-- Navbar Section -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-white shadow-sm rounded-bottom mb-2" style="z-index:10;">
+        <nav class="">
             <div class="container justify-content-center">
                 <div class="tabs navbar-nav flex-row">
                     <button class="tab-btn nav-link active" onclick="showTab('planes')">📋 Planes</button>
@@ -702,14 +702,7 @@
             <div class="recommendations">
                 <h3>💡 Recomendaciones Personalizadas</h3>
                 <div id="recommendations-list">
-                    <div class="recommendation-item">
-                        <span>🌤️ Perfecto para senderismo - clima despejado</span>
-                        <strong>Recomendado hoy</strong>
-                    </div>
-                    <div class="recommendation-item">
-                        <span>🎨 Actividades creativas - ideal para tarde lluviosa</span>
-                        <strong>Plan B</strong>
-                    </div>
+                    <!-- Las recomendaciones se llenarán dinámicamente -->
                 </div>
             </div>
         </div>
@@ -981,18 +974,99 @@
             }
         }
 
-        // Cargar clima al inicio
+        // --- RECOMMENDATIONS LOGIC ---
+        // Popularity data (example, could be dynamic)
+        const popularPlans = [
+            { name: 'Excursiones Naturales', icon: '🏔️', key: 'excursiones', popularity: 95 },
+            { name: 'Senderismo Urbano', icon: '🥾', key: 'senderismo', popularity: 90 },
+            { name: 'Saludas Gourmet', icon: '🥗', key: 'saludas', popularity: 85 },
+            { name: 'Cine al Aire Libre', icon: '🎬', key: 'cine-aire', popularity: 80 },
+            { name: 'Picnic + Cerámica', icon: '🎨', key: 'picnic-ceramica', popularity: 75 },
+            { name: 'Slackline & Equilibrio', icon: '🏃', key: 'slackline', popularity: 70 },
+            { name: 'Cicloruta Temática', icon: '🚴', key: 'cicloruta', popularity: 65 },
+            { name: 'Cine Clásico', icon: '🎭', key: 'cine-clasico', popularity: 60 }
+        ];
+
+        // Weather-based recommendation logic
+        let currentWeather = { main: '', description: '', temp: 0 };
+
+        function updateRecommendations() {
+            const origen = document.getElementById('origen')?.value || 'extranjero';
+            const recommendationsList = document.getElementById('recommendations-list');
+            recommendationsList.innerHTML = '';
+
+            // Weather logic
+            let weatherType = currentWeather.main.toLowerCase();
+            let weatherRec = null;
+            if (weatherType.includes('rain')) {
+                weatherRec = {
+                    icon: '🎨',
+                    text: 'Actividades creativas o bajo techo - ideal para tarde lluviosa',
+                    label: 'Plan B'
+                };
+            } else if (weatherType.includes('clear') || weatherType.includes('sun')) {
+                weatherRec = {
+                    icon: '🥾',
+                    text: 'Perfecto para senderismo o excursiones - clima despejado',
+                    label: 'Recomendado hoy'
+                };
+            } else if (weatherType.includes('cloud')) {
+                weatherRec = {
+                    icon: '🚴',
+                    text: 'Cicloruta o picnic en parques - clima nublado agradable',
+                    label: 'Opción popular'
+                };
+            } else {
+                weatherRec = {
+                    icon: '🥗',
+                    text: 'Explora la gastronomía local en restaurantes destacados',
+                    label: 'Siempre recomendado'
+                };
+            }
+
+            // Add weather-based recommendation
+            recommendationsList.innerHTML += `
+                <div class="recommendation-item animate__animated animate__fadeInDown">
+                    <span>${weatherRec.icon} ${weatherRec.text}</span>
+                    <strong>${weatherRec.label}</strong>
+                </div>
+            `;
+
+            // Add top 2 popular plans (not already shown)
+            let shown = new Set([weatherRec.icon]);
+            let count = 0;
+            for (let plan of popularPlans) {
+                if (count >= 2) break;
+                if (!shown.has(plan.icon)) {
+                    recommendationsList.innerHTML += `
+                        <div class="recommendation-item animate__animated animate__fadeInUp">
+                            <span>${plan.icon} ${plan.name} - muy popular esta semana</span>
+                            <strong>Top ${count+1}</strong>
+                        </div>
+                    `;
+                    shown.add(plan.icon);
+                    count++;
+                }
+            }
+        }
+
+        // Fetch weather and update recommendations on load
         window.onload = function() {
             fetch('https://api.openweathermap.org/data/2.5/weather?q=Medellín&appid=YOUR_API_KEY&units=metric')
                 .then(response => response.json())
                 .then(data => {
-                    const weatherDesc = data.weather[0].description;
-                    const temp = Math.round(data.main.temp);
-                    document.getElementById('weather').innerText = `${temp}°C, ${weatherDesc}`;
+                    currentWeather = {
+                        main: data.weather[0].main,
+                        description: data.weather[0].description,
+                        temp: Math.round(data.main.temp)
+                    };
+                    document.getElementById('weather').innerText = `${currentWeather.temp}°C, ${currentWeather.description}`;
+                    updateRecommendations();
                 })
                 .catch(error => {
                     document.getElementById('weather').innerText = 'No disponible';
-                    console.error('Error fetching weather data:', error);
+                    currentWeather = { main: '', description: '', temp: 0 };
+                    updateRecommendations();
                 });
         };
 
